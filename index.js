@@ -24,7 +24,7 @@ app.get('/', (req, res) => {
     res.json('Password Reset and login');
 });
 
-app.get('/allusers',[authenticate], async (req, res) => {
+app.get('/allusers', async (req, res) => {
     try {
         let client = await mongoClient.connect(dbUrl);
         let opendb = client.db(database);
@@ -98,9 +98,9 @@ app.post('/login', async (req, res) => {
 
 app.post('/emaillink', async (req, res) => {
     try {
-        let client = await mongoClient.connect(dbUrl);
-        let db = client.db(database);
-        let user = await db.collection(userCollection).findOne({ email: req.body.mail });
+        // let client = await mongoClient.connect(dbUrl);
+        // let db = client.db(database);
+        // let user = await db.collection(userCollection).findOne({ email: req.body.mail });
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -110,11 +110,11 @@ app.post('/emaillink', async (req, res) => {
         });
         let mailOptions = {
             from: process.env.EMAIL,
-            to: user.email,
+            to: req.body.mail,
             subject: 'Reset Password',
             text: 'click here to reset password',
             html:
-                '<h3>Reset your password Here</h3><a href="http://127.0.0.1:5501/Password_ResetAnd_Login/frontend/resetfront/Reset.html">Click Here</a>',
+                '<h3>Reset your password Here</h3><a href="https://pass-reset-frontend.netlify.app/reset">Click Here</a>',
         };
         transporter.sendMail(mailOptions, (err, data) => {
             if (err) {
@@ -124,7 +124,7 @@ app.post('/emaillink', async (req, res) => {
             }
         });
         res.json({ message: "mail sent to your targetmail..check it" })
-        client.close();
+        // client.close();
     } catch (error) {
         console.log(error);
         res.json({ message: 'Something went wrong' });
