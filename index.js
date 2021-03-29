@@ -9,9 +9,9 @@ dotenv.config();
 // const { authenticate } = require('./auth');
 
 const mongoClient = mongodb.MongoClient;
-// const dbUrl = process.env.DBURL || 'mongodb://127.0.0.1:27017';
-const dbUrl = 'mongodb://127.0.0.1:27017';
-const port = process.env.PORT || 3000;
+const dbUrl = process.env.DBURL || 'mongodb://127.0.0.1:27017';
+// const dbUrl = 'mongodb://127.0.0.1:27017';
+const port = 3000;
 const database = 'PasswordReset';
 const userCollection = 'data';
 
@@ -55,11 +55,11 @@ app.post('/register', async (req, res) => {
             req.body.code = hash;
             let data = await opendb.collection(userCollection)
                 .insertOne({ username: req.body.name, email: req.body.mail, password: req.body.code });
-            client.close();
             res.json({ message: "updated", data })
         } else {
             res.json({ message: "you already having an account...please login to continue..." })
         }
+        client.close();
     } catch (error) {
         console.log(error);
         res.json({ message: "something went wrong with register" });
