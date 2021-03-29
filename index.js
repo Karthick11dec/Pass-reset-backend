@@ -11,7 +11,7 @@ dotenv.config();
 const mongoClient = mongodb.MongoClient;
 // const dbUrl = process.env.DBURL || 'mongodb://127.0.0.1:27017';
 const dbUrl = 'mongodb://127.0.0.1:27017';
-const port = 3000;
+const port = process.env.PORT || 3000;
 const database = 'PasswordReset';
 const userCollection = 'data';
 
@@ -158,6 +158,5 @@ app.put('/reset', async (req, res) => {
         res.json({ message: 'Something went wrong' });
     }
 });
-
 
 app.listen(process.env.PORT || port, () => console.log(`Server started on port : ${port}`));
