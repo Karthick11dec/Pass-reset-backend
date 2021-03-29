@@ -6,7 +6,7 @@ const nodemailer = require('nodemailer');
 const cors = require('cors');
 const dotenv = require('dotenv');
 dotenv.config();
-const { authenticate } = require('./auth');
+// const { authenticate } = require('./auth');
 
 const mongoClient = mongodb.MongoClient;
 const dbUrl = process.env.DBURL || 'mongodb://127.0.0.1:27017';
@@ -24,7 +24,7 @@ app.get('/', (req, res) => {
     res.json('Password Reset and login');
 });
 
-app.get('/allusers',[authenticate], async (req, res) => {
+app.get('/allusers', async (req, res) => {
     try {
         let client = await mongoClient.connect(dbUrl);
         let opendb = client.db(database);
@@ -137,24 +137,12 @@ app.put('/reset', async (req, res) => {
     try {
         let client = await mongoClient.connect(dbUrl);
         let db = client.db(database);
-        // let update = await db.collection(userCollection).findOneAndUpdate({ email: req.body.mail }, { $set: { password: req.body.code } });
-        // client.close()
-        // res.json({message:"update",update})
-        let user = await db.collection(userCollection).findOne({ email: req.body.mail });
+        let salt = await bcryptjs.genSalt(10);
+        let hash = await bcryptjs.hash(req.body.code, salt);
+        req.body.code = hash;
+        let update = await db.collection(userCollection).findOneAndUpdate({ email: req.body.mail }, { $set: { password: req.body.code } });
         client.close();
-        // console.log(user)
-        if (user) {
-            let client = await mongoClient.connect(dbUrl);
-            let db = client.db(database);
-            let salt = await bcryptjs.genSalt(10);
-            let hash = await bcryptjs.hash(req.body.code, salt);
-            req.body.code = hash;
-            let update = await db.collection(userCollection).findOneAndUpdate({ email: req.body.mail }, { $set: { password: req.body.code } });
-            client.close();
-            res.json({ message: "password update", update })
-        } else {
-            res.json({ message: "failed to update password" })
-        }
+        res.json({ message: "password update", update })
 
     } catch (error) {
         console.log(error);
