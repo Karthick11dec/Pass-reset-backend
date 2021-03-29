@@ -71,6 +71,7 @@ app.post('/login', async (req, res) => {
         let client = await mongoClient.connect(dbUrl);
         let db = client.db(database);
         let user = await db.collection(userCollection).findOne({ email: req.body.mail });
+        // console.log(user)
         // client.close();
         // res.json({message:"haii"})
         if (user) {
@@ -101,7 +102,7 @@ app.post('/emaillink', async (req, res) => {
         let client = await mongoClient.connect(dbUrl);
         let db = client.db(database);
         let user = await db.collection(userCollection).findOne({ email: req.body.mail });
-        console.log(user)
+        // console.log(user)
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -140,6 +141,7 @@ app.put('/reset', async (req, res) => {
         // client.close()
         // res.json({message:"update",update})
         let user = await db.collection(userCollection).findOne({ email: req.body.mail });
+        // console.log(user)
         if (user) {
             let salt = await bcryptjs.genSalt(10);
             let hash = await bcryptjs.hash(req.body.code, salt);
