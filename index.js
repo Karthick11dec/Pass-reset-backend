@@ -10,7 +10,7 @@ dotenv.config();
 
 const mongoClient = mongodb.MongoClient;
 // const dbUrl = process.env.DBURL || 'mongodb://127.0.0.1:27017';
-const dbUrl ='mongodb://127.0.0.1:27017';
+const dbUrl = 'mongodb://127.0.0.1:27017';
 const port = 3000;
 const database = 'PasswordReset';
 const userCollection = 'data';
@@ -137,13 +137,22 @@ app.put('/reset', async (req, res) => {
     try {
         let client = await mongoClient.connect(dbUrl);
         let db = client.db(database);
-        let salt = await bcryptjs.genSalt(10);
-        let hash = await bcryptjs.hash(req.body.code, salt);
-        req.body.code = hash;
-        await db.collection(userCollection).findOneAndUpdate({ email: req.body.mail }, { $set: { password: req.body.code } });
+        let data = await db.collection(userCollection).findOne({ email: req.body.mail });
+        // console.log(data.password)
+        let result = await bcryptjs.compare(req.body.code, data.password);
+        // console.log(result)
+        if (!result) {
+            let salt = await bcryptjs.genSalt(10);
+            let hash = await bcryptjs.hash(req.body.code, salt);
+            // req.body.code = hash;
+            await db.collection(userCollection).findOneAndUpdate({ email: req.body.mail }, { $set: { password: hash } });
+            let data = await db.collection(userCollection).find().toArray();
+            res.json({message:"new password update successfully!!!",data})
+        } else {
+            res.json({ message: "entered password is same as the existing one" })
+        }
         client.close();
-        res.json({ message: "password update"})
-
+        res.json({ message: "password update" })
     } catch (error) {
         console.log(error);
         res.json({ message: 'Something went wrong' });
