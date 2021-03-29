@@ -101,6 +101,7 @@ app.post('/emaillink', async (req, res) => {
         let client = await mongoClient.connect(dbUrl);
         let db = client.db(database);
         let user = await db.collection(userCollection).findOne({ email: req.body.mail });
+        console.log(user)
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -110,7 +111,7 @@ app.post('/emaillink', async (req, res) => {
         });
         let mailOptions = {
             from: process.env.EMAIL,
-            to: user.mail,
+            to: user.email,
             subject: 'Reset Password',
             text: 'click here to reset password',
             html:
