@@ -24,7 +24,7 @@ app.get('/', (req, res) => {
     res.json('Password Reset and login');
 });
 
-app.get('/allusers', async (req, res) => {
+app.get('/allusers',[authenticate], async (req, res) => {
     try {
         let client = await mongoClient.connect(dbUrl);
         let opendb = client.db(database);
