@@ -9,8 +9,8 @@ dotenv.config();
 // const { authenticate } = require('./auth');
 
 const mongoClient = mongodb.MongoClient;
-const dbUrl = process.env.DBURL || 'mongodb://127.0.0.1:27017';
-// const dbUrl ='mongodb://127.0.0.1:27017';
+// const dbUrl = process.env.DBURL || 'mongodb://127.0.0.1:27017';
+const dbUrl ='mongodb://127.0.0.1:27017';
 const port = 3000;
 const database = 'PasswordReset';
 const userCollection = 'data';
@@ -140,9 +140,9 @@ app.put('/reset', async (req, res) => {
         let salt = await bcryptjs.genSalt(10);
         let hash = await bcryptjs.hash(req.body.code, salt);
         req.body.code = hash;
-        let update = await db.collection(userCollection).findOneAndUpdate({ email: req.body.mail }, { $set: { password: req.body.code } });
+        await db.collection(userCollection).findOneAndUpdate({ email: req.body.mail }, { $set: { password: req.body.code } });
         client.close();
-        res.json({ message: "password update", update })
+        res.json({ message: "password update"})
 
     } catch (error) {
         console.log(error);
