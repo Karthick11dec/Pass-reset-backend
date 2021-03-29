@@ -141,8 +141,11 @@ app.put('/reset', async (req, res) => {
         // client.close()
         // res.json({message:"update",update})
         let user = await db.collection(userCollection).findOne({ email: req.body.mail });
+        client.close();
         // console.log(user)
         if (user) {
+            let client = await mongoClient.connect(dbUrl);
+            let db = client.db(database);
             let salt = await bcryptjs.genSalt(10);
             let hash = await bcryptjs.hash(req.body.code, salt);
             req.body.code = hash;
